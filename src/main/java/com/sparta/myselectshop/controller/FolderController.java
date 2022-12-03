@@ -4,10 +4,7 @@ import com.sparta.myselectshop.dto.FolderRequestDto;
 import com.sparta.myselectshop.entity.Folder;
 import com.sparta.myselectshop.service.FolderService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -21,12 +18,19 @@ public class FolderController {
      
      @PostMapping("/folders")
      public List<Folder> addFolders(
-          @RequestBody FolderRequestDto folderRequestDto,
-          HttpServletRequest request
+               @RequestBody FolderRequestDto folderRequestDto,
+               HttpServletRequest request
      ) {
-          
           List<String> folderNames = folderRequestDto.getFolderNames();
           
           return folderService.addFolders(folderNames, request);
      }
+     
+     // 회원이 등록한 모든 폴더 조회
+     @GetMapping ("/folders")
+     public List<Folder> getFolders(HttpServletRequest request) {
+          return folderService.getFolders(request);
+     }
+     
+     
 }

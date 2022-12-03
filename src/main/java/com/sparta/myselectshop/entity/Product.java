@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -37,6 +39,9 @@ public class Product {
      @Column(nullable = false)
      private Long userId;
      
+     @ManyToMany
+     private List<Folder> folderList = new ArrayList<>();
+     
      public Product(ProductRequestDto requestDto, Long userId) {
           this.title = requestDto.getTitle();
           this.image = requestDto.getImage();
@@ -52,5 +57,9 @@ public class Product {
      
      public void updateByItemDto(ItemDto itemDto) {
           this.lprice = itemDto.getLprice();
+     }
+     
+     public void addFolder(Folder folder) {
+          this.folderList.add(folder);
      }
 }
