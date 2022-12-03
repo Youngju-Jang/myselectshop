@@ -13,4 +13,5 @@ public class ShopController {
      public ModelAndView shop() {
           return new ModelAndView("index");
      }
+     
 }
