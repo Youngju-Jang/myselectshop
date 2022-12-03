@@ -23,7 +23,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -184,7 +186,16 @@ public class ProductService {
                     throw new IllegalArgumentException("회원님의 관심상품이 아니거나, 회원님의 폴더가 아닙니다~^^");
                }
                
-               // 4) 상품에 폴더를 추가합니다.
+//               if(!product.getFolderList().contains(folder)){
+//                    // 4) 상품에 폴더를 추가합니다.
+//                    product.addFolder(folder);
+//               };
+               Optional<Product> overlapFolder = productRepository.findByIdAndFolderList_Id(product.getId(), folder.getId());
+
+               if(overlapFolder.isPresent()) {
+                    throw new IllegalArgumentException("중복된 폴더입니다.");
+               }
+//             4) 상품에 폴더를 추가합니다.
                product.addFolder(folder);
                
                return product;

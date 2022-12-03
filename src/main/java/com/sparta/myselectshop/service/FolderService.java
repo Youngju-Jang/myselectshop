@@ -63,7 +63,6 @@ public class FolderService {
                          folderList.add(folder);
                     }
                }
-               
                return folderRepository.saveAll(folderList);
           } else {
                return null;
