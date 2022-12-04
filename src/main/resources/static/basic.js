@@ -14,7 +14,6 @@ $(document).ready(function () {
                 xhr.setRequestHeader("Authorization", auth);
             },
         }).done(function (fragment) {
-            // console.log(fragment);
             $('#fragment').replaceWith(fragment);
         });
     }
