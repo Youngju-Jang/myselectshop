@@ -7,6 +7,7 @@ import com.sparta.myselectshop.entity.Product;
 import com.sparta.myselectshop.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,9 +27,16 @@ public class ProductController {
           // 응답 보내기
           return productService.createProduct(requestDto, request);
      }
+     // (관리자용) 등록된 모든 상품 목록 조회
+     @Secured ("ROLE_ADMIN")
+     @GetMapping("/api/admin/products")
+     public List<Product> getAllProducts() {
+          return productService.getAllProducts();
+     }
+     
      
      // 관심 상품 조회하기
-     // 관심 상품 조회하기
+     
      @GetMapping("/products")
      public Page<Product> getProducts(
           @RequestParam("page") int page,

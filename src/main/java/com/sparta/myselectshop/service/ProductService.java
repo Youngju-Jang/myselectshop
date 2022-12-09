@@ -13,6 +13,7 @@ import com.sparta.myselectshop.repository.FolderRepository;
 import com.sparta.myselectshop.repository.ProductRepository;
 import com.sparta.myselectshop.repository.UserRepository;
 import io.jsonwebtoken.Claims;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,8 +23,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,6 +33,10 @@ public class ProductService {
      private final ProductRepository productRepository;
      private final UserRepository userRepository;
      private final JwtUtil jwtUtil;
+     
+     public List<Product> getAllProducts() {
+          return null;
+     }
      
      @Transactional
      public ProductResponseDto createProduct(ProductRequestDto requestDto, HttpServletRequest request) {
@@ -203,4 +206,5 @@ public class ProductService {
                return null;
           }
      }
+     
 }

@@ -44,6 +44,7 @@ public class FolderService {
                if (jwtUtil.validateToken(token)) {
                     // 토큰에서 사용자 정보 가져오기
                     claims = jwtUtil.getUserInfoFromToken(token);
+                    
                } else {
                     throw new IllegalArgumentException("Token Error");
                }
