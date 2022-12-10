@@ -1,31 +1,27 @@
 package com.sparta.myselectshop.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.sparta.myselectshop.dto.LoginRequestDto;
 import com.sparta.myselectshop.dto.SignupRequestDto;
-import com.sparta.myselectshop.entity.User;
-import com.sparta.myselectshop.entity.UserRoleEnum;
-import com.sparta.myselectshop.repository.UserRepository;
+import com.sparta.myselectshop.jwt.JwtUtil;
+import com.sparta.myselectshop.service.KakaoService;
+import com.sparta.myselectshop.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.util.Optional;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/api/user")
 public class UserController {
      
-     private final PasswordEncoder passwordEncoder;
-     private final UserRepository userRepository;
+     KakaoService kakaoService;
      
-     // ADMIN_TOKEN
-     private static final String ADMIN_TOKEN = "AAABnvxRVklrnYxKZ0aHgTBcXukeZygoC";
+     private final UserService userService;
      
      @GetMapping("/signup")
      public ModelAndView signupPage() {
@@ -39,44 +35,37 @@ public class UserController {
      
      @PostMapping("/signup")
      public String signup(SignupRequestDto signupRequestDto) {
-          
-          String username = signupRequestDto.getUsername();
-          String password = passwordEncoder.encode(signupRequestDto.getPassword());
-          
-          // 회원 중복 확인
-          Optional<User> found = userRepository.findByUsername(username);
-          if (found.isPresent()) {
-               throw new IllegalArgumentException("중복된 사용자가 존재합니다.");
-          }
-          
-          // 사용자 ROLE 확인
-          UserRoleEnum role = UserRoleEnum.USER;
-          if (signupRequestDto.isAdmin()) {
-               if (!signupRequestDto.getAdminToken().equals(ADMIN_TOKEN)) {
-                    throw new IllegalArgumentException("관리자 암호가 틀려 등록이 불가능합니다.");
-               }
-               role = UserRoleEnum.ADMIN;
-          }
-          
-          User user = new User(username, password, role);
-          userRepository.save(user);
-          
+          userService.signup(signupRequestDto);
           return "redirect:/api/user/login-page";
      }
      
+     @ResponseBody
      @PostMapping("/login")
-     public String login(@AuthenticationPrincipal UserDetails userDetails) {
-          System.out.println("*********************************************************");
-          System.out.println("UserController.login");
-          System.out.println("userDetails.getUsername() = " + userDetails.getUsername());
-          System.out.println("*********************************************************");
-          
-          return "redirect:/api/user/login-page";
+     public String login(@RequestBody LoginRequestDto loginRequestDto, HttpServletResponse response) {
+          userService.login(loginRequestDto, response);
+          return "success";
      }
      
-     @PostMapping("/forbidden")
-     public ModelAndView forbidden() {
+     @GetMapping("/forbidden")
+     public ModelAndView getForbidden() {
           return new ModelAndView("forbidden");
      }
      
+     @PostMapping("/forbidden")
+     public ModelAndView postForbidden() {
+          return new ModelAndView("forbidden");
+     }
+     
+     @GetMapping("/kakao/callback")
+     public String kakaoLogin(@RequestParam String code, HttpServletResponse response) throws JsonProcessingException {
+          // code: 카카오 서버로부터 받은 인가 코드
+          String createToken = kakaoService.kakaoLogin(code, response);
+          
+          // Cookie 생성 및 직접 브라우저에 Set
+          Cookie cookie = new Cookie(JwtUtil.AUTHORIZATION_HEADER, createToken.substring(7));
+          cookie.setPath("/");
+          response.addCookie(cookie);
+          
+          return "redirect:/api/shop";
+     }
 }
